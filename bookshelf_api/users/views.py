@@ -4,9 +4,10 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework.decorators import permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework_simplejwt.exceptions import TokenError
 import logging
-from .serializers import UserRegistrationSerializer, UserLoginSerializer
+from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer
 from .services import UserService
 
 
@@ -58,4 +59,49 @@ class UserLoginView(APIView):
         except Exception as e:
             logger.error(f"Unexpected error during user login: {e}")
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@permission_classes([AllowAny])
+class RefreshTokenView(APIView):
+    def post(self, request):
+        try:
+            refresh_token = request.data.get('refresh')
+            if not refresh_token:
+                return Response({'error': 'Refresh token is required'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            try:
+                token = RefreshToken(refresh_token)
+                new_access_token = str(token.access_token)
+                new_refresh_token = str(token)
+                return Response({
+                    'message': 'Token refreshed successfully',
+                    'access': new_access_token,
+                    'refresh': new_refresh_token
+                }, status=status.HTTP_200_OK)
+            
+            except TokenError as e:
+                logger.error(f"Invalid or expired refresh token: {e}")
+                return Response({'error': 'Invalid or expired refresh token'}, status=status.HTTP_401_UNAUTHORIZED)
+        except Exception as e:
+            logger.error(f"Unexpected error during token refresh: {e}")
+            return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@permission_classes([IsAuthenticated])
+class UserProfileView(APIView):
+    def patch(self, request):
+        try:
+            user = request.user
+            serializer = UserProfileSerializer(user, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'message': 'Profile updated successfully'}, status=status.HTTP_200_OK)
+            
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except ValidationError as e:
+            logger.error(f"Validation error during profile update: {e}")
+            return Response({'error': e.detail['error']}, status=e.status_code)
+        except Exception as e:
+            logger.error(f"Unexpected error during profile update: {e}")
+            return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
