@@ -17,6 +17,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'corsheaders',
+
+    'users.apps.UsersConfig',
+    'books.apps.BooksConfig',
+    'reading_lists.apps.ReadingListsConfig',
 ]
 
 MIDDLEWARE = [
@@ -42,7 +50,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_THROTTLE_RATES': {
         'anon': '100/hour',
-        'user': '10000/hour',
+        'user': '1000/hour',
     },
 }
 
@@ -94,7 +102,7 @@ DATABASES = {
     }
 }
 
-# AUTH_USER_MODEL = 'users.Users'
+AUTH_USER_MODEL = 'users.Users'
 
 
 AUTH_PASSWORD_VALIDATORS = [
