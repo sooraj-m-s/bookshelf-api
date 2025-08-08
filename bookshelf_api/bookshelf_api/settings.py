@@ -1,6 +1,7 @@
 from pathlib import Path
 from decouple import config, Csv
 from datetime import timedelta
+import cloudinary
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -56,7 +57,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=3000),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
@@ -130,4 +131,13 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Cloudinary configuration
+cloudinary.config (
+    cloud_name= config('cloud_name'),
+    api_key= config('api_key'),
+    api_secret= config('api_secret'),
+    secure= True
+)
 
