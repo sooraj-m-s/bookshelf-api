@@ -26,6 +26,7 @@ class Books(models.Model):
     published_date = models.DateField()
     is_available = models.BooleanField(default=True)
     slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
+    is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
