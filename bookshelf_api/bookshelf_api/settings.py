@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
+    'drf_yasg',
 
     'users.apps.UsersConfig',
     'books.apps.BooksConfig',
@@ -140,4 +141,25 @@ cloudinary.config (
     api_secret= config('api_secret'),
     secure= True
 )
+
+
+# Swagger
+# SWAGGER_SETTINGS = {
+#     'SECURITY_DEFINITIONS': {
+#         'Bearer': {
+#             'type': 'apiKey',
+#             'name': 'Authorization',
+#             'in': 'header'
+#         }
+#     },
+#     'USE_SESSION_AUTH': False,
+#     'JSON_EDITOR': True,
+#     'SUPPORTED_SUBMIT_METHODS': [
+#         'get', 'post', 'put', 'delete', 'patch'
+#     ],
+#     'OPERATIONS_SORTER': 'alpha',
+#     'TAGS_SORTER': 'alpha',
+#     'DOC_EXPANSION': 'none',
+#     'DEEP_LINKING': True,
+# }
 
