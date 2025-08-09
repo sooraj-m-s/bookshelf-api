@@ -5,7 +5,7 @@ from .views import RegisterUserView, UserLoginView, UserProfileView, RefreshToke
 urlpatterns = [
     path('register/', RegisterUserView.as_view(), name='register'),
     path('login/', UserLoginView.as_view(), name='login'),
-    path('token/refresh/', RefreshTokenView.as_view(), name='token_refresh'),
     path('profile/', UserProfileView.as_view(), name='profile'),
+    path('token/refresh/', RefreshTokenView.as_view(), name='token_refresh'),
 ]
 

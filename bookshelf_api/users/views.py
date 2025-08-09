@@ -61,6 +61,30 @@ class UserLoginView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@permission_classes([IsAuthenticated])
+class UserProfileView(APIView):
+    def get(self, request):
+        user = request.user
+        serializer = UserProfileSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def patch(self, request):
+        try:
+            user = request.user
+            serializer = UserProfileSerializer(user, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'message': 'Profile updated successfully'}, status=status.HTTP_200_OK)
+            
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except ValidationError as e:
+            logger.error(f"Validation error during profile update: {e}")
+            return Response({'error': e.detail['error']}, status=e.status_code)
+        except Exception as e:
+            logger.error(f"Unexpected error during profile update: {e}")
+            return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @permission_classes([AllowAny])
 class RefreshTokenView(APIView):
     def post(self, request):
@@ -84,24 +108,5 @@ class RefreshTokenView(APIView):
                 return Response({'error': 'Invalid or expired refresh token'}, status=status.HTTP_401_UNAUTHORIZED)
         except Exception as e:
             logger.error(f"Unexpected error during token refresh: {e}")
-            return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-@permission_classes([IsAuthenticated])
-class UserProfileView(APIView):
-    def patch(self, request):
-        try:
-            user = request.user
-            serializer = UserProfileSerializer(user, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response({'message': 'Profile updated successfully'}, status=status.HTTP_200_OK)
-            
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except ValidationError as e:
-            logger.error(f"Validation error during profile update: {e}")
-            return Response({'error': e.detail['error']}, status=e.status_code)
-        except Exception as e:
-            logger.error(f"Unexpected error during profile update: {e}")
             return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
