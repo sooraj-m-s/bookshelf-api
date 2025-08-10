@@ -5,6 +5,10 @@ Built with Python, lightweight by design, and ready to run locally or deploy any
 
 [![Repo](https://img.shields.io/badge/repo-bookshelf--api-181717?logo=github)](https://github.com/sooraj-m-s/bookshelf-api)
 ![Python](https://img.shields.io/badge/Python-3.x-3776AB?logo=python&logoColor=white)
+![Django REST Framework](https://img.shields.io/badge/DRF-API-092E20?logo=django&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?logo=postgresql&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-secure-000000?logo=jsonwebtokens&logoColor=white)
+![Cloudinary](https://img.shields.io/badge/Cloudinary-Media-3448C5?logo=cloudinary&logoColor=white)
 
 ---
 
