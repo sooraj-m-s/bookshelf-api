@@ -1,0 +1,9 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "startCommand": "sh -c \"cd bookshelf_api && python manage.py migrate --noinput && python manage.py collectstatic --noinput || true && gunicorn bookshelf_api.asgi:application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT\""
+  }
+}
