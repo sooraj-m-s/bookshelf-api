@@ -104,8 +104,8 @@ DATABASES = {
         'NAME': config('DB_NAME'),
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('HOST', default='localhost'),
-        'PORT': config('PORT', default='5432'),
+        'HOST': config('HOST'),
+        'PORT': config('PORT'),
     }
 }
 

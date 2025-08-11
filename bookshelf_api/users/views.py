@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -12,6 +13,12 @@ from .services import UserService
 
 
 logger = logging.getLogger(__name__)
+
+
+@permission_classes([AllowAny])
+def health_check(request):
+    return HttpResponse(status=200)
+
 
 @permission_classes([AllowAny])
 class RegisterUserView(APIView):
