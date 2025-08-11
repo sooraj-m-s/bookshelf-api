@@ -1,9 +1,11 @@
 {
-  "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "NIXPACKS"
+    "builder": "nixpacks",
+    "buildCommand": "python -m pip install --upgrade pip && pip install -r requirements.txt"
   },
   "deploy": {
-    "startCommand": "sh -c \"cd bookshelf_api && python manage.py migrate --noinput && python manage.py collectstatic --noinput || true && gunicorn bookshelf_api.asgi:application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT\""
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10,
+    "startCommand": "python bookshelf_api/manage.py collectstatic --noinput && python bookshelf_api/manage.py migrate && python bookshelf_api/manage.py runserver 0.0.0.0:$PORT"
   }
 }
