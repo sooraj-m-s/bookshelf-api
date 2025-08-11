@@ -6,7 +6,7 @@
   "deploy": {
     "numReplicas": 1,
     "startCommand": "cd bookshelf_api && python manage.py migrate && gunicorn bookshelf_api.wsgi --bind=0.0.0.0:$PORT",
-    "healthcheckPath": "/api/",
+    "healthcheckPath": "/api/login/",
     "healthcheckTimeout": 300000,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
