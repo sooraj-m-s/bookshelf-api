@@ -31,7 +31,7 @@ Built with Python, lightweight by design, and ready to run locally or deploy any
 
 **Prerequisites**
 - Python 3.10+
-- pip or poetry 
+- pip 
 - Git
 
 **Clone and set up:**
@@ -50,8 +50,6 @@ source .bookshelf_env/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
-# or
-poetry install && poetry shell
 ```
 
 ---

@@ -29,7 +29,7 @@ class BookService:
                     try:
                         upload_result = cloudinary.uploader.upload(
                             cover_image,
-                            upload_preset=config('cloudinary_upload_preset'),
+                            upload_preset=config('CLOUDINARY_UPLOAD_PRESET'),
                             resource_type='image'
                         )
                         cover_image_url = upload_result['secure_url']
@@ -71,7 +71,7 @@ class BookService:
                             try:
                                 upload_result = cloudinary.uploader.upload(
                                     value,
-                                    upload_preset=config('cloudinary_upload_preset'),
+                                    upload_preset=config('CLOUDINARY_UPLOAD_PRESET'),
                                     resource_type='image'
                                 )
                                 new_cover_image_url = upload_result['secure_url']
