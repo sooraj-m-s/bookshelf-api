@@ -24,6 +24,13 @@ class ReadingListCreateSerializer(serializers.ModelSerializer):
 
 
 class ReadingListUpdateSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(required=False, allow_blank=True)
+
+    def validate_name(self, value):
+        if ReadingList.objects.filter(user=self.context['request'].user, name=value).exists():
+            raise serializers.ValidationError("A reading list with this name already exists.")
+        return value
+    
     class Meta:
         model = ReadingList
         fields = ['name']

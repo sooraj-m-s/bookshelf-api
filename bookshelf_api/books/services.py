@@ -97,9 +97,12 @@ class BookService:
             except Books.DoesNotExist:
                 logger.warning(f"Book not found or already deleted with slug: {slug}")
                 raise ValidationError({"error": "Book not found or already deleted"}, code=status.HTTP_404_NOT_FOUND)
+            except ValidationError as e:
+                logger.error(f"Validation error during book update: {e}")
+                raise ValidationError({"error": e.detail}, code=e.status_code)
             except Exception as e:
                 logger.error(f"Error updating book with slug {slug}: {str(e)}")
-                raise ValidationError({"error": f"An unexpected error occurred: {str(e)}"}, code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                raise ValidationError({"error": "An unexpected error occurred"}, code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @staticmethod
     def delete_book(slug, user):
@@ -117,7 +120,10 @@ class BookService:
             except Books.DoesNotExist:
                 logger.warning(f"Book not found or already deleted with slug: {slug}")
                 raise ValidationError({"error": "Book not found"}, code=status.HTTP_404_NOT_FOUND)
+            except ValidationError as e:
+                logger.error(f"Validation error during book deletion: {e}")
+                raise ValidationError({"error": e.detail}, code=status.HTTP_400_BAD_REQUEST)
             except Exception as e:
                 logger.error(f"Error deleting book with slug {slug}: {str(e)}")
-                raise ValidationError({"error": f"An unexpected error occurred: {str(e)}"}, code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                raise ValidationError({"error": "An unexpected error occurred"}, code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

@@ -21,14 +21,13 @@ class CreateReadingListView(APIView):
         try:
             serializer = ReadingListCreateSerializer(data=request.data)
             if serializer.is_valid():
-                try:
-                    reading_list = ReadingListService.create_reading_list(request.user, serializer.validated_data['name'])
-                    return Response({'message': 'Reading list created', 'id': reading_list.id}, status=201)
-                except ValidationError as e:
-                    logger.error(f"Validation error during reading list creation: {e}")
-                    return Response({'error': str(e)}, status=400)
+                reading_list = ReadingListService.create_reading_list(request.user, serializer.validated_data['name'])
+                return Response({'message': 'Reading list created', 'id': reading_list.id}, status=201)
                 
             return Response(serializer.errors, status=400)
+        except ValidationError as e:
+            logger.error(f"Validation error during reading list creation: {e}")
+            return Response({'error': e.detail}, status=e.status_code)
         except Exception as e:
             logger.error(f"Error creating reading list: {e}")
             return Response({'error': 'Internal server error'}, status=500)
@@ -38,17 +37,16 @@ class CreateReadingListView(APIView):
 class UpdateReadingListView(APIView):
     def put(self, request, list_id):
         try:
-            try:
-                reading_list = ReadingList.objects.get(user=request.user, id=list_id)
-            except ReadingList.DoesNotExist:
-                logger.error(f"Reading list not found: {list_id}")
-                return Response({'error': 'Reading list not found'}, status=404)
-            
-            serializer = ReadingListUpdateSerializer(data=request.data)
+            reading_list = ReadingList.objects.get(user=request.user, id=list_id)
+            serializer = ReadingListUpdateSerializer(data=request.data, context={'request': request})
             if serializer.is_valid():
                 serializer.update(reading_list, serializer.validated_data)
                 return Response({'message': 'Reading list updated'}, status=200)
+            
             return Response(serializer.errors, status=400)
+        except ReadingList.DoesNotExist:
+            logger.error(f"Reading list not found: {list_id}")
+            return Response({'error': 'Reading list not found'}, status=404)
         except Exception as e:
             logger.error(f"Error updating reading list: {e}")
             return Response({'error': 'Internal server error'}, status=500)
@@ -64,6 +62,9 @@ class DeleteReadingListView(APIView):
         except ReadingList.DoesNotExist:
             logger.error(f"Reading list not found for deletion: {list_id}")
             return Response({'error': 'Reading list not found'}, status=404)
+        except Exception as e:
+            logger.error(f"Error deleting reading list: {e}")
+            return Response({'error': 'Internal server error'}, status=500)
 
 
 @permission_classes([IsAuthenticated])
@@ -82,20 +83,17 @@ class ListReadingListsView(APIView):
 class AddBookToListView(APIView):
     def post(self, request, list_id):
         try:
-            try:
-                reading_list = ReadingList.objects.get(user=request.user, id=list_id)
-            except ReadingList.DoesNotExist:
-                return Response({'error': 'Reading list not found'}, status=404)
-
+            reading_list = ReadingList.objects.get(user=request.user, id=list_id)
             serializer = AddBookToListSerializer(data=request.data)
             if serializer.is_valid():
                 book_id = serializer.validated_data['book_id']
                 listing_order = serializer.validated_data.get('listing_order')
-                book = Books.objects.get(id=book_id)
-                ReadingListService.add_book_to_list(reading_list, book, listing_order)
+                ReadingListService.add_book_to_list(reading_list, book_id, listing_order)
 
                 return Response({'message': 'Book added to list'}, status=201)
             return Response(serializer.errors, status=400)
+        except ReadingList.DoesNotExist:
+            return Response({'error': 'Reading list not found'}, status=404)
         except Books.DoesNotExist:
             logger.error(f"Book not found: {book_id}")
             return Response({'error': 'Book not found'}, status=404)

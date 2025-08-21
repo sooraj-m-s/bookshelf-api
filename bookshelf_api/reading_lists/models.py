@@ -9,6 +9,9 @@ class ReadingList(models.Model):
         verbose_name = 'Reading List'
         verbose_name_plural = 'Reading Lists'
 
+    def __str__(self):
+        return self.name
+
 
 class ReadingListItem(models.Model):
     reading_list = models.ForeignKey(ReadingList, on_delete=models.CASCADE, related_name='items')
@@ -21,4 +24,8 @@ class ReadingListItem(models.Model):
         verbose_name = 'Reading List Item'
         verbose_name_plural = 'Reading List Items'
         ordering = ['listing_order', '-updated_at']
+
+
+    def __str__(self):
+        return f"{self.book.title}"
 

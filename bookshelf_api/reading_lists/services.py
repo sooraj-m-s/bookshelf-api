@@ -3,6 +3,7 @@ from django.db.models import F, Max
 from rest_framework.exceptions import ValidationError
 from django.core.paginator import Paginator, EmptyPage
 import logging
+from books.models import Books
 from .models import ReadingList, ReadingListItem
 
 
@@ -12,15 +13,21 @@ class ReadingListService:
     @staticmethod
     def create_reading_list(user, name):
         try:
+            if ReadingList.objects.filter(user=user, name=name).exists():
+                raise ValidationError("A reading list with this name already exists.")
+                
             return ReadingList.objects.create(user=user, name=name)
         except IntegrityError:
             logger.error(f"Failed to create reading list: {name}")
-            raise ValidationError("A reading list with this name already exists.")
+            raise ValidationError("Failed to create reading list due to an unexpected error.")
 
     @staticmethod
-    def add_book_to_list(reading_list, book, listing_order=None):
-        if ReadingListItem.objects.filter(reading_list=reading_list, book=book).exists():
-            raise ValidationError("Book already in list.")
+    def add_book_to_list(reading_list, book_id, listing_order=None):
+        if ReadingListItem.objects.filter(reading_list=reading_list, book_id=book_id).exists():
+            raise ValidationError("Book already in list")
+        book = Books.objects.get(id=book_id)
+        if book.is_deleted or not book.is_available:
+            raise ValidationError("Book not found or unavailable")
         try:
             with transaction.atomic():
                 if listing_order is not None:
@@ -59,6 +66,8 @@ class ReadingListService:
             current_book_ids = [item.book_id for item in current_items]
             if set(book_ids) != set(current_book_ids):
                 raise ValidationError("Provided book IDs do not match the list.")
+            if set(book_ids) == set(current_book_ids):
+                raise ValidationError("No changes detected")
             with transaction.atomic():
                 for order, book_id in enumerate(book_ids, start=1):
                     ReadingListItem.objects.filter(reading_list=reading_list, book_id=book_id).update(listing_order=order)
